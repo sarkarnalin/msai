@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium AI Assistant</title>
+    <title>OpenRouter AI Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,7 +14,6 @@
             --user-msg-bg: #007bff;
             --bot-msg-bg: #e9ecef;
             --accent-color: #007bff;
-            --input-bg: #ffffff;
             --border-color: #ddd;
         }
 
@@ -26,7 +25,6 @@
             --user-msg-bg: #005c4b;
             --bot-msg-bg: #202c33;
             --accent-color: #00a884;
-            --input-bg: #2a3942;
             --border-color: #313d45;
         }
 
@@ -38,10 +36,9 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-            transition: all 0.3s ease;
+            transition: 0.3s;
         }
 
-        /* Header Area */
         header {
             background-color: var(--sidebar-color);
             padding: 15px 20px;
@@ -49,17 +46,16 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .logo { font-weight: 600; font-size: 1.2rem; color: var(--accent-color); }
 
-        /* Settings Overlay */
+        /* Settings Modal */
         #settingsOverlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             z-index: 1000;
         }
 
@@ -69,12 +65,10 @@
             margin: 50px auto;
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
         }
 
-        .settings-modal h2 { margin-top: 0; font-size: 1.2rem; }
-
-        /* Chat Window */
+        /* Chat Area */
         #chat-window {
             flex: 1;
             overflow-y: auto;
@@ -91,26 +85,12 @@
             font-size: 0.95rem;
             line-height: 1.5;
             word-wrap: break-word;
-            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .user-message { align-self: flex-end; background-color: var(--user-msg-bg); color: white; border-bottom-right-radius: 2px; }
+        .bot-message { align-self: flex-start; background-color: var(--bot-msg-bg); color: var(--text-color); border-bottom-left-radius: 2px; }
 
-        .user-message {
-            align-self: flex-end;
-            background-color: var(--user-msg-bg);
-            color: white;
-            border-bottom-right-radius: 2px;
-        }
-
-        .bot-message {
-            align-self: flex-start;
-            background-color: var(--bot-msg-bg);
-            color: var(--text-color);
-            border-bottom-left-radius: 2px;
-        }
-
-        /* Input Section */
+        /* Input Area */
         .input-group {
             padding: 15px 20px;
             background: var(--sidebar-color);
@@ -120,85 +100,60 @@
         }
 
         input, select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--input-bg);
-            color: var(--text-color);
-            outline: none;
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border-radius: 8px; border: 1px solid var(--border-color);
+            background: var(--bg-color); color: var(--text-color);
         }
 
-        .chat-input {
-            flex: 1;
-            margin-bottom: 0;
-            border-radius: 25px;
-            padding: 12px 20px;
-        }
+        .chat-input { flex: 1; margin-bottom: 0; border-radius: 25px; }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .btn-primary { background: var(--accent-color); color: white; }
-        .btn-round { border-radius: 50px; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
-
-        /* Mobile Responsive */
-        @media (max-width: 600px) {
-            .message { max-width: 90%; }
-        }
     </style>
 </head>
 <body data-theme="light">
 
 <header>
-    <div class="logo">AI Assistant Pro</div>
+    <div class="logo">OpenRouter AI</div>
     <button class="btn btn-primary" onclick="openSettings()">Settings ⚙️</button>
 </header>
 
 <div id="settingsOverlay">
     <div class="settings-modal">
-        <h2>Configuration</h2>
-        <label>OpenAI API Key:</label>
-        <input type="password" id="apiKey" placeholder="sk-...">
+        <h3>Settings</h3>
+        <label>OpenRouter API Key:</label>
+        <input type="password" id="apiKey" placeholder="sk-or-v1-...">
         
-        <label>Model Name:</label>
-        <input type="text" id="modelName" placeholder="gpt-4o-mini">
+        <label>Model ID:</label>
+        <input type="text" id="modelName" placeholder="google/gemini-2.0-flash-exp:free">
         
-        <label>Theme Mode:</label>
-        <select id="themeSelect" onchange="changeTheme()">
+        <label>Theme:</label>
+        <select id="themeSelect" onchange="applyTheme()">
             <option value="light">Light Mode ☀️</option>
             <option value="dark">Dark Mode 🌙</option>
         </select>
 
         <div style="display: flex; gap: 10px;">
             <button class="btn btn-primary" style="flex: 1;" onclick="saveSettings()">Save</button>
-            <button class="btn" style="background: #666; color: white;" onclick="closeSettings()">Cancel</button>
+            <button class="btn" onclick="closeSettings()">Close</button>
         </div>
-        <button class="btn" style="width: 100%; margin-top: 10px; background: #ff4757; color: white;" onclick="clearHistory()">Clear All Chat</button>
+        <button class="btn" style="width: 100%; margin-top: 10px; background: #ff4757; color: white;" onclick="clearHistory()">Clear History</button>
     </div>
 </div>
 
 <div id="chat-window"></div>
 
 <div class="input-group">
-    <input type="text" id="userInput" class="chat-input" placeholder="আপনার প্রশ্নটি এখানে লিখুন..." onkeypress="if(event.key === 'Enter') handleSend()">
-    <button class="btn btn-primary btn-round" onclick="handleSend()">➤</button>
+    <input type="text" id="userInput" class="chat-input" placeholder="এখানে লিখুন..." onkeypress="if(event.key === 'Enter') handleSend()">
+    <button class="btn btn-primary" onclick="handleSend()">Send</button>
 </div>
 
 <script>
-    let chatHistory = JSON.parse(localStorage.getItem('chat_v2')) || [];
+    let chatHistory = JSON.parse(localStorage.getItem('openrouter_chat')) || [];
     const chatWindow = document.getElementById('chat-window');
 
-    // Initialization
     window.onload = () => {
-        const config = JSON.parse(localStorage.getItem('ai_config')) || { theme: 'light', model: 'gpt-4o-mini' };
+        const config = JSON.parse(localStorage.getItem('ai_config')) || { theme: 'light', model: 'google/gemini-2.0-flash-exp:free' };
         document.body.setAttribute('data-theme', config.theme);
         document.getElementById('themeSelect').value = config.theme;
         document.getElementById('apiKey').value = config.apiKey || '';
@@ -209,7 +164,7 @@
     function openSettings() { document.getElementById('settingsOverlay').style.display = 'block'; }
     function closeSettings() { document.getElementById('settingsOverlay').style.display = 'none'; }
 
-    function changeTheme() {
+    function applyTheme() {
         const theme = document.getElementById('themeSelect').value;
         document.body.setAttribute('data-theme', theme);
     }
@@ -217,7 +172,7 @@
     function saveSettings() {
         const config = {
             apiKey: document.getElementById('apiKey').value,
-            model: document.getElementById('modelName').value || 'gpt-4o-mini',
+            model: document.getElementById('modelName').value || 'google/gemini-2.0-flash-exp:free',
             theme: document.getElementById('themeSelect').value
         };
         localStorage.setItem('ai_config', JSON.stringify(config));
@@ -245,7 +200,7 @@
 
         if (!text) return;
         if (!config || !config.apiKey) {
-            alert("দয়া করে Settings থেকে API Key সেট করুন!");
+            alert("Settings থেকে API Key দিন!");
             openSettings();
             return;
         }
@@ -254,33 +209,33 @@
         chatHistory.push({ role: 'user', content: text });
         input.value = '';
 
-        // Bot thinking placeholder
         const botDiv = document.createElement('div');
         botDiv.className = 'message bot-message';
-        botDiv.innerText = 'লিখছি...';
+        botDiv.innerText = 'AI ভাবছে...';
         chatWindow.appendChild(botDiv);
 
         try {
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${config.apiKey}`
+                    'Authorization': `Bearer ${config.apiKey}`,
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'GitHub AI Chatbot'
                 },
                 body: JSON.stringify({
                     model: config.model,
-                    messages: chatHistory.map(m => ({ role: m.role, content: m.content }))
+                    messages: chatHistory
                 })
             });
 
             const data = await response.json();
-            
-            if (data.error) throw new Error(data.error.message);
+            if (data.error) throw new Error(data.error.message || "API Error");
 
             const botReply = data.choices[0].message.content;
             botDiv.innerText = botReply;
             chatHistory.push({ role: 'assistant', content: botReply });
-            localStorage.setItem('chat_v2', JSON.stringify(chatHistory));
+            localStorage.setItem('openrouter_chat', JSON.stringify(chatHistory));
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
         } catch (err) {
@@ -291,10 +246,9 @@
 
     function clearHistory() {
         if(confirm("সব চ্যাট মুছে ফেলতে চান?")) {
-            localStorage.removeItem('chat_v2');
+            localStorage.removeItem('openrouter_chat');
             chatHistory = [];
             renderChat();
-            closeSettings();
         }
     }
 </script>
